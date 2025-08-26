@@ -96,7 +96,7 @@ def predict_chest_condition(model, image_array):
 # Main app
 def main():
     # Header
-    st.title("🫁 Chest X-ray Analysis System")
+    st.title("🫀🫁 Chest X-ray Analysis System")
     st.markdown("Upload a chest X-ray image to detect tuberculosis and pneumonia using AI")
     
     

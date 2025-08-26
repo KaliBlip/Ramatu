@@ -16,282 +16,217 @@ st.set_page_config(
 )
 
 # Custom CSS with Tailwind-like styling
-def load_custom_css():
+import streamlit as st
+import numpy as np
+from PIL import Image
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import img_to_array
+
+# Streamlit Page Config
+st.set_page_config(
+    page_title="🫀🫁 TB Detection System",
+    page_icon="🫁",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
+
+# Custom Modern CSS
+def load_modern_css():
     st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    /* Global Styles */
-    .main {
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    }
-    
-    /* Header Styles */
-    .main-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 2rem 1rem;
-        border-radius: 15px;
-        margin-bottom: 2rem;
-        text-align: center;
-        color: white;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-    
-    .hero-emoji {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        display: block;
-        animation: bounce 2s infinite;
-    }
-    
-    @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% {
-            transform: translateY(0);
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        html, body, [class*="css"] {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f8fafc;
         }
-        40% {
-            transform: translateY(-10px);
+
+        /* Main Container */
+        .stApp {
+            max-width: 600px;
+            margin: auto;
+            padding: 1rem;
         }
-        60% {
-            transform: translateY(-5px);
+
+        /* Header */
+        .main-header {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            color: white;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
         }
-    }
-    
-    .hero-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-    
-    .hero-subtitle {
-        font-size: 1.2rem;
-        opacity: 0.9;
-        font-weight: 300;
-    }
-    
-    /* Card Styles */
-    .custom-card {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        margin-bottom: 2rem;
-    }
-    
-    .upload-card {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        border: 2px dashed #e2e8f0;
-        transition: all 0.3s ease;
-    }
-    
-    .upload-card:hover {
-        border-color: #667eea;
-        background: #f8fafc;
-        transform: translateY(-2px);
-    }
-    
-    .sidebar-card {
-        background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid #667eea;
-    }
-    
-    /* Button Styles */
-    .analyze-button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        padding: 1rem 2rem;
-        border-radius: 15px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        text-decoration: none;
-        display: inline-block;
-        margin: 1rem 0;
-    }
-    
-    .analyze-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    }
-    
-    /* Results Styles */
-    .result-normal {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 15px;
-        text-align: center;
-        margin: 1rem 0;
-        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-    }
-    
-    .result-tuberculosis {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 15px;
-        text-align: center;
-        margin: 1rem 0;
-        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
-    }
-    
-    .result-pneumonia {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 15px;
-        text-align: center;
-        margin: 1rem 0;
-        box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
-    }
-    
-    .confidence-bar {
-        background: #e5e7eb;
-        border-radius: 10px;
-        height: 20px;
-        margin: 1rem 0;
-        overflow: hidden;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .confidence-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #10b981, #059669);
-        border-radius: 10px;
-        transition: width 2s ease-in-out;
-    }
-    
-    .confidence-fill-tb {
-        background: linear-gradient(90deg, #ef4444, #dc2626);
-    }
-    
-    .confidence-fill-pneumonia {
-        background: linear-gradient(90deg, #f59e0b, #d97706);
-    }
-    
-    /* Recommendations */
-    .recommendation-box {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-    
-    .recommendation-list {
-        list-style: none;
-        padding: 0;
-    }
-    
-    .recommendation-item {
-        display: flex;
-        align-items: flex-start;
-        margin: 0.75rem 0;
-        padding: 0.5rem;
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 10px;
-    }
-    
-    .recommendation-emoji {
-        font-size: 1.2rem;
-        margin-right: 0.75rem;
-        min-width: 2rem;
-    }
-    
-    /* Status indicators */
-    .status-indicator {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        border-radius: 25px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        margin: 0.25rem;
-    }
-    
-    .status-active {
-        background: #dcfce7;
-        color: #166534;
-        border: 1px solid #bbf7d0;
-    }
-    
-    .status-pulse {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #10b981;
-        margin-right: 0.5rem;
-        animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.5; }
-        100% { opacity: 1; }
-    }
-    
-    /* Image preview */
-    .image-preview {
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        margin: 1rem 0;
-    }
-    
-    .image-info {
-        background: #f8fafc;
-        border-radius: 10px;
-        padding: 1rem;
-        margin: 1rem 0;
-        border-left: 4px solid #667eea;
-    }
-    
-    /* Hide Streamlit elements */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    
-    /* Custom metric cards */
-    .metric-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        margin: 1rem 0;
-        border-top: 4px solid #667eea;
-    }
-    
-    .metric-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin: 0.5rem 0;
-    }
-    
-    .metric-label {
-        color: #6b7280;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
+
+        .hero-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            opacity: 0.85;
+            margin-top: 0.5rem;
+        }
+
+        /* Upload Section */
+        .upload-box {
+            border: 2px dashed #d1d5db;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            background: white;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-box:hover {
+            border-color: #6366f1;
+            background: #f9fafb;
+        }
+
+        /* Results Card */
+        .result-card {
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Confidence Meter */
+        .confidence-bar {
+            background: #e5e7eb;
+            height: 14px;
+            border-radius: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            transition: width 1.5s ease;
+            border-radius: 8px;
+        }
+
+        .confidence-fill.normal {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .confidence-fill.tb {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .confidence-fill.pneumonia {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+
+        /* Button */
+        .stButton>button {
+            width: 100%;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            font-size: 1rem;
+            border-radius: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: transform 0.2s ease;
+        }
+
+        .stButton>button:hover {
+            transform: scale(1.02);
+        }
     </style>
     """, unsafe_allow_html=True)
+
+# Load Model
+@st.cache_resource
+def load_tb_model():
+    try:
+        return load_model("TuberPneu_model.h5")
+    except:
+        st.error("❌ Model file missing. Please ensure 'TuberPneu_model.h5' is available.")
+        return None
+
+# Image Preprocessing
+def preprocess_image(image):
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+    image = image.resize((224, 224))
+    img_array = img_to_array(image)
+    return np.expand_dims(img_array, axis=0) / 255.0
+
+# Prediction
+
+def predict_chest_condition(model, image_array):
+    prediction = model.predict(image_array, verbose=0)
+    classes = ["Normal", "Tuberculosis", "Pneumonia"]
+    predicted_class = np.argmax(prediction[0])
+    label = classes[predicted_class]
+    confidence = prediction[0][predicted_class]
+    return label, confidence
+
+# Display Results
+def display_results(label, confidence):
+    result_type = "normal" if label == "Normal" else "tb" if label == "Tuberculosis" else "pneumonia"
+    st.markdown(f"""
+        <div class="result-card">
+            <div class="result-title">{label}</div>
+            <p>Confidence: {confidence*100:.2f}%</p>
+            <div class="confidence-bar">
+                <div class="confidence-fill {result_type}" style="width: {confidence*100}%;"></div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+# Main App
+load_modern_css()
+
+st.markdown("""
+    <div class="main-header">
+        <h1 class="hero-title">🫀🫁 Chest X-ray AI</h1>
+        <p class="hero-subtitle">Detect Tuberculosis & Pneumonia in Seconds</p>
+    </div>
+""", unsafe_allow_html=True)
+
+model = load_tb_model()
+
+uploaded_file = st.file_uploader("Upload Chest X-ray", type=["jpg", "jpeg", "png"])
+
+if uploaded_file:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Uploaded X-ray", use_container_width=True)
+
+    if st.button("🚀 Analyze Image"):
+        if model:
+            with st.spinner("Analyzing X-ray..."):
+                processed_image = preprocess_image(image)
+                label, confidence = predict_chest_condition(model, processed_image)
+                display_results(label, confidence)
+        else:
+            st.error("Model not loaded.")
+
+# Footer
+st.markdown("""
+    <p style='text-align:center; color:#6b7280; margin-top:2rem;'>
+        🫀🫁 Built with ❤️ using TensorFlow & Streamlit
+    </p>
+""", unsafe_allow_html=True)
+
+
 
 # Load the model (with caching for better performance)
 @st.cache_resource
