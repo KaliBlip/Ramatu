@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 # Configure the Streamlit page
 st.set_page_config(
-    page_title="TB Detection System",
+    page_title="Chest X-ray Analysis System",
     page_icon="🫁",
     layout="wide"
 )
