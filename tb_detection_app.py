@@ -9,7 +9,7 @@ import base64
 
 # Configure the Streamlit page
 st.set_page_config(
-    page_title="🫀🫁 TB Detection System",
+    page_title="🫀🫁 TB and Pneumo Detection System",
     page_icon="🫁",
     layout="wide",
     initial_sidebar_state="expanded"
