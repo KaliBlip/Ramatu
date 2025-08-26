@@ -99,37 +99,7 @@ def main():
     st.title("🫁 Chest X-ray Analysis System")
     st.markdown("Upload a chest X-ray image to detect tuberculosis and pneumonia using AI")
     
-    # Add this to your main() function to debug
-def debug_environment():
-    import os
-    import sys
     
-    st.subheader("🔍 Debug Information")
-    
-    # Check Python and package versions
-    st.write(f"Python version: {sys.version}")
-    
-    # Check if model file exists
-    model_path = "TuberPneu_model.h5"
-    if os.path.exists(model_path):
-        file_size = os.path.getsize(model_path)
-        st.success(f"✅ Model file found (Size: {file_size / (1024*1024):.2f} MB)")
-    else:
-        st.error("❌ Model file not found")
-    
-    # List files in current directory
-    files = os.listdir(".")
-    st.write("Files in current directory:", files)
-    
-    # Check TensorFlow
-    try:
-        import tensorflow as tf
-        st.success(f"✅ TensorFlow version: {tf.__version__}")
-    except ImportError:
-        st.error("❌ TensorFlow not installed")
-
-# Add this call in your main() function for debugging
-# debug_environment()
 
     # Sidebar with information
     with st.sidebar:
