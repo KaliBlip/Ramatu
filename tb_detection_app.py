@@ -14,10 +14,27 @@ st.set_page_config(
 )
 
 # Load the model (with caching for better performance)
+# Improved model loading with better error handling
 @st.cache_resource
 def load_tb_model():
+    import os
+    model_path = "TuberPneu_model.h5"
+    
+    # Check if model file exists
+    if not os.path.exists(model_path):
+        st.error(f"Model file '{model_path}' not found. Please ensure it's uploaded correctly.")
+        return None
+    
+    # Check file size to ensure Git LFS worked
+    file_size = os.path.getsize(model_path)
+    if file_size < 1000:  # If less than 1KB, likely a Git LFS pointer file
+        st.error("Model file appears to be a Git LFS pointer. Ensure Git LFS is properly configured.")
+        return None
+    
     try:
-        model = load_model("TuberPneu_model.h5")
+        # Load with explicit compile=False to avoid potential issues
+        model = load_model(model_path, compile=False)
+        st.info(f"Model loaded successfully (Size: {file_size / (1024*1024):.2f} MB)")
         return model
     except Exception as e:
         st.error(f"Error loading model: {e}")
@@ -82,6 +99,38 @@ def main():
     st.title("🫁 Chest X-ray Analysis System")
     st.markdown("Upload a chest X-ray image to detect tuberculosis and pneumonia using AI")
     
+    # Add this to your main() function to debug
+def debug_environment():
+    import os
+    import sys
+    
+    st.subheader("🔍 Debug Information")
+    
+    # Check Python and package versions
+    st.write(f"Python version: {sys.version}")
+    
+    # Check if model file exists
+    model_path = "TuberPneu_model.h5"
+    if os.path.exists(model_path):
+        file_size = os.path.getsize(model_path)
+        st.success(f"✅ Model file found (Size: {file_size / (1024*1024):.2f} MB)")
+    else:
+        st.error("❌ Model file not found")
+    
+    # List files in current directory
+    files = os.listdir(".")
+    st.write("Files in current directory:", files)
+    
+    # Check TensorFlow
+    try:
+        import tensorflow as tf
+        st.success(f"✅ TensorFlow version: {tf.__version__}")
+    except ImportError:
+        st.error("❌ TensorFlow not installed")
+
+# Add this call in your main() function for debugging
+# debug_environment()
+
     # Sidebar with information
     with st.sidebar:
         st.header("ℹ️ About")
