@@ -15,21 +15,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS with Tailwind-like styling
-import streamlit as st
-import numpy as np
-from PIL import Image
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import img_to_array
-
-# Streamlit Page Config
-st.set_page_config(
-    page_title="🫀🫁 TB Detection System",
-    page_icon="🫁",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
-
 # Custom Modern CSS
 def load_modern_css():
     st.markdown("""
